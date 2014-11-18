@@ -1,0 +1,26 @@
+{
+  "name": "MyTimeMag",
+  "version": "0.0.1",
+  "authors": [
+    "rodeyseijkens <me@rodey.nl>"
+  ],
+  "description": "A Time Magazine Customized for you!",
+  "main": "src/index.html",
+  "license": "MIT",
+  "homepage": "www.rodey.nl",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "core-ajax": "Polymer/core-ajax#~0.5.1",
+    "core-animated-pages": "Polymer/core-animated-pages#~0.5.1",
+    "core-pages": "Polymer/core-pages#~0.5.1",
+    "paper-button": "Polymer/paper-button#~0.5.1",
+    "paper-input": "Polymer/paper-input#~0.5.1"
+  }
+}
