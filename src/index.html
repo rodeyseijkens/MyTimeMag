@@ -15,10 +15,12 @@
     <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 
     <link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
+    <link rel="import" href="../bower_components/core-animated-pages/transitions/scale-up.html">
     <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
     <link rel="import" href="../bower_components/paper-input/paper-input.html">
     <link rel="import" href="../bower_components/paper-button/paper-button.html">
     <link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
+    <link rel="import" href="../bower_components/core-drawer-panel/core-drawer-panel.html">
 
     <link href="assets/css/main.css" rel="stylesheet" type="text/css">
 </head>
@@ -27,9 +29,10 @@
 <polymer-element name="my-time-mag">
     <template>
         <link href="assets/css/style.css" rel="stylesheet" type="text/css">
-        <core-animated-pages selected="{{options.page}}" notap id="core_pages" transitions="slide-from-right">
+        <core-animated-pages selected="{{options.page}}" notap id="core_pages"
+                             transitions="hero-transition cross-fade scale-up">
             <section id="section-login" active horizontal layout center center-justified>
-                <paper-shadow z="5" id="login-card" class="card" layout vertical>
+                <paper-shadow z="5" id="login-card" class="card" layout vertical cross-fade>
                     <h1>Sign-In</h1>
                     <paper-input-decorator id="loginEmailDecorator" label="Email" floatinglabel layout vertical
                                            error="{{login.error.email}}">
@@ -42,19 +45,17 @@
                         <input id="loginPasswordInput" is="core-input" type="password"
                                committedValue="{{login.committedValues.password}}" required>
                     </paper-input-decorator>
-                    <paper-button id="login-button" on-tap="{{checkLogin}}">Login</paper-button>
+                    <paper-button id="login-button" on-tap="{{checkLogin}}" hero-id="profile" hero>Login</paper-button>
                     <core-ajax id="loginAjax" url="http://mytimemag.rodey.nl/private/user.php?action=login"
                                params='{{login.committedValues}}' handleAs="json"
                                on-core-response="{{loginResponse}}"></core-ajax>
                 </paper-shadow>
             </section>
             <section id="section-content" active horizontal layout center center-justified>
-                <paper-shadow z="5" id="content-card" class="card" layout vertical>
-                </paper-shadow>
-                <paper-shadow z="2" id="content-card" class="card" layout vertical>
-                </paper-shadow>
-                <paper-shadow z="1" id="content-card" class="card" layout vertical>
-                </paper-shadow>
+                <core-drawer-panel cross-fade>
+                    <div drawer> Drawer panel... </div>
+                    <div main> Main panel... </div>
+                </core-drawer-panel>
             </section>
         </core-animated-pages>
 
@@ -75,6 +76,14 @@
                 this.options.account = [{id: false}];
             },
 
+            nextPage: function (scope) {
+                if (!scope) {
+                    this.options.page++;
+                } else {
+                    scope.options.page++;
+                }
+            },
+
             checkLogin: function () {
                 if (this.validateEmail() && this.validatePassword()) {
                     this.$.loginAjax.go();
@@ -84,6 +93,8 @@
             validateEmail: function (check) {
                 var decorator = this.$.loginEmailDecorator;
                 var input = this.$.loginEmailInput;
+
+                input.setCustomValidity("");
 
                 if (check == "invalid") {
                     this.login.error.email = "Email is unknown.";
@@ -102,6 +113,8 @@
             validatePassword: function (check) {
                 var decorator = this.$.loginPasswordDecorator;
                 var input = this.$.loginPasswordInput;
+
+                input.setCustomValidity("");
 
                 if (check == "invalid") {
                     this.login.error.password = "Incorrect password.";
@@ -128,7 +141,7 @@
                 } else {
                     this.options.account = response.account;
 
-                    this.options.page = 1;
+                    this.nextPage();
                 }
             }
         });

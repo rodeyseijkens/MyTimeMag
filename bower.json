@@ -21,6 +21,7 @@
     "core-animated-pages": "Polymer/core-animated-pages#~0.5.1",
     "core-pages": "Polymer/core-pages#~0.5.1",
     "paper-button": "Polymer/paper-button#~0.5.1",
-    "paper-input": "Polymer/paper-input#~0.5.1"
+    "paper-input": "Polymer/paper-input#~0.5.1",
+    "core-drawer-panel": "Polymer/core-drawer-panel#~0.5.1"
   }
 }
