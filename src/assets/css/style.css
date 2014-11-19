@@ -6,6 +6,7 @@
 }
 .card {
   width: 100%;
+  max-width: 300px;
   height: auto;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
@@ -15,15 +16,166 @@
   margin: 20px;
   background-color: #ffffff;
 }
+.card h1 {
+  margin: 0px 0px 20px;
+}
 #login-button {
   padding: 10px;
   margin: 30px 0px 0px;
   color: white;
   background-color: #6386c5;
 }
-h1 {
-  margin: 0px 0px 20px;
+.search-on core-toolbar paper-icon-button,
+.search-on core-toolbar span.title {
+  opacity: 0;
+}
+core-drawer-panel {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+core-drawer-panel core-toolbar {
+  background-color: #6386c5;
+  color: white;
+}
+core-drawer-panel core-toolbar .title {
+  font-size: 16px;
+}
+core-drawer-panel [main] core-toolbar .title span {
+  margin-left: 24px;
+}
+core-drawer-panel [main] core-toolbar .title paper-icon-button[icon=arrow-drop-down] {
+  visibility: visible;
+  display: inline-block;
+}
+core-drawer-panel [main] core-toolbar .title paper-icon-button[icon=arrow-drop-up] {
+  visibility: hidden;
+  display: none;
+}
+core-drawer-panel [main] core-toolbar .title[show] paper-icon-button[icon=arrow-drop-down] {
+  visibility: hidden;
+  display: none;
+}
+core-drawer-panel [main] core-toolbar .title[show] paper-icon-button[icon=arrow-drop-up] {
+  visibility: visible;
+  display: inline-block;
+}
+core-drawer-panel [main] paper-tabs {
+  background-color: white;
+  height: 0;
+  transition: height .2s;
+}
+core-drawer-panel [main] paper-tabs::shadow #selectionBar {
+  background-color: #6386c5;
+}
+core-drawer-panel [main] paper-tabs paper-tab::shadow #ink {
+  color: #6386c5;
+  opacity: .5;
+}
+core-drawer-panel [main] paper-tabs[show] {
+  height: 43px;
 }
 core-drawer-panel [drawer] {
   background: white;
+}
+core-drawer-panel [drawer] .title {
+  text-align: center;
+}
+core-drawer-panel [drawer] .title [icon=account-circle] {
+  margin-right: 10px;
+}
+#searchHolder {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -o-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  -o-align-items: center;
+  align-items: center;
+  -webkit-box-flex: 1;
+  -webkit-flex: 0 0 auto;
+  -moz-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  -o-flex: 0 0 auto;
+  flex: 0 0 auto;
+  width: 40px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  background-color: #6386c5;
+}
+#searchHolder input {
+  background-color: inherit;
+  border: none;
+  font-size: 20px;
+  outline: none;
+  padding: 0;
+  color: inherit;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 0 0;
+  -moz-flex: 1 0 0;
+  -ms-flex: 1 0 0;
+  -o-flex: 1 0 0;
+  flex: 1 0 0;
+  visibility: hidden;
+  -webkit-appearance: none;
+}
+#searchHolder[show] {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 0 16px;
+  margin-left: 0;
+}
+#searchHolder[show] input {
+  padding: 5px;
+  margin-left: 10px;
+  visibility: visible;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.main-card {
+  width: 100%;
+  max-width: 250px;
+  height: 100%;
+  max-height: 300px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+  padding: 20px;
+  margin: 20px;
+  background-color: #ffffff;
+}
+.main-card .animate-like.ng-leave,
+.main-card .animate-dislike.ng-leave,
+.main-card .animate-partial {
+  transition: all linear 0.3s;
+}
+.main-card .animate-like.ng-leave {
+  transform: translateX(0px) rotate(0deg);
+}
+.main-card .animate-partial.animate-like-partial {
+  transform: translateX(10%) rotate(5deg);
+}
+.main-card .animate-like.ng-leave.ng-leave-active {
+  transform: translateX(100%) rotate(60deg);
+}
+.main-card .animate-dislike.ng-leave {
+  transform: translateX(0px) rotate(0deg);
+}
+.main-card .animate-partial.animate-dislike-partial {
+  transform: translateX(-10%) rotate(-5deg);
+}
+.main-card .animate-dislike.ng-leave.ng-leave-active {
+  transform: translateX(100%) rotate(60deg);
 }

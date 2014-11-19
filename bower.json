@@ -22,6 +22,9 @@
     "core-pages": "Polymer/core-pages#~0.5.1",
     "paper-button": "Polymer/paper-button#~0.5.1",
     "paper-input": "Polymer/paper-input#~0.5.1",
-    "core-drawer-panel": "Polymer/core-drawer-panel#~0.5.1"
+    "core-drawer-panel": "Polymer/core-drawer-panel#~0.5.1",
+    "core-toolbar": "Polymer/core-toolbar#~0.5.1",
+    "paper-icon-button": "Polymer/paper-icon-button#~0.5.1",
+    "paper-tabs": "Polymer/paper-tabs#~0.5.1"
   }
 }
