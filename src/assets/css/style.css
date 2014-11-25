@@ -143,39 +143,40 @@ core-drawer-panel [drawer] .title [icon=account-circle] {
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.22);
 }
-.main-card {
+#section-article {
+  background: white;
+}
+#section-article core-toolbar {
+  background-color: #6386c5;
+  color: white;
+}
+#section-article core-toolbar .title {
+  font-size: 16px;
+}
+#section-article core-toolbar core-image {
   width: 100%;
-  max-width: 250px;
   height: 100%;
-  max-height: 300px;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
-  border-bottom-left-radius: 2px;
+}
+#section-article #articleContainer {
+  z-index: 0;
+}
+#section-article paper-fab {
+  position: fixed;
+  z-index: 10;
+  bottom: 20px;
+  right: 10px;
+}
+#section-article article {
+  box-sizing: border-box;
+  float: left;
   padding: 20px;
-  margin: 20px;
-  background-color: #ffffff;
+  width: 100%;
+  z-index: 0;
 }
-.main-card .animate-like.ng-leave,
-.main-card .animate-dislike.ng-leave,
-.main-card .animate-partial {
-  transition: all linear 0.3s;
+#section-article article h1 {
+  font-size: 30px;
+  margin: 0;
 }
-.main-card .animate-like.ng-leave {
-  transform: translateX(0px) rotate(0deg);
-}
-.main-card .animate-partial.animate-like-partial {
-  transform: translateX(10%) rotate(5deg);
-}
-.main-card .animate-like.ng-leave.ng-leave-active {
-  transform: translateX(100%) rotate(60deg);
-}
-.main-card .animate-dislike.ng-leave {
-  transform: translateX(0px) rotate(0deg);
-}
-.main-card .animate-partial.animate-dislike-partial {
-  transform: translateX(-10%) rotate(-5deg);
-}
-.main-card .animate-dislike.ng-leave.ng-leave-active {
-  transform: translateX(100%) rotate(60deg);
+#section-article article h3 {
+  font-size: 20px;
 }

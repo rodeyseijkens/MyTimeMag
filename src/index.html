@@ -9,67 +9,278 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="../bower_components/webcomponentsjs/webcomponents.js"></script>
 
     <link rel="import" href="../bower_components/font-roboto/roboto.html">
 
     <link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
     <link rel="import" href="../bower_components/core-animated-pages/transitions/slide-from-right.html">
+    <link rel="import" href="../bower_components/core-animated-pages/transitions/slide-up.html">
     <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
     <link rel="import" href="../bower_components/core-drawer-panel/core-drawer-panel.html">
     <link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
     <link rel="import" href="../bower_components/core-icon/core-icon.html">
     <link rel="import" href="../bower_components/core-icon-button/core-icon-button.html">
+    <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
+    <link rel="import" href="../bower_components/core-image/core-image.html">
+    <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
     <link rel="import" href="../bower_components/paper-input/paper-input.html">
     <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
     <link rel="import" href="../bower_components/paper-button/paper-button.html">
     <link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
     <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+    <link rel="import" href="../bower_components/juicy-html/juicy-html.html">
+    <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 
 
     <link href="assets/css/main.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
+<polymer-element name="flick-card">
+    <template>
+        <link href="assets/css/flick-card.css" rel="stylesheet" type="text/css">
+        <paper-shadow z="1" layout vertical>
+            <core-icon icon="thumb-up" class="like overlay"></core-icon>
+            <core-icon icon="thumb-down" class="dislike overlay"></core-icon>
+            <content></content>
+            <paper-ripple id="ripple" class="recenteringTouch" style="pointer-events: none;" fit></paper-ripple>
+        </paper-shadow>
+    </template>
+    <script>
+        var xPoint = function (x) {
+            this.updated = false;
+            this.x = this._prev = this._origin = x;
+            this._timeStamp = (new Date()).getTime();
+        };
+        xPoint.prototype = {
+            TIMER_RESET_THRESHOLD: -5/* px */,
+            VELOCITY_THRESHOLD: -0.2 /* px/ms */,
+            distance: function () {
+                // distance between touch start and current point
+                return this.x - this._origin;
+            },
+            update: function (x) {
+                // reset time stamp at move stop
+                if (x - this.x > this.TIMER_RESET_THRESHOLD) {
+                    this._timeStamp = (new Date()).getTime();
+                    this._prev = this.x;
+                }
+                this.x = x;
+                this.updated = true;
+            }
+        };
+
+        var util = {
+            applyAnimations: function (n, move) {
+                if (move == 0) {
+                    var valueTransition = "all 0.3s";
+                } else {
+                    var valueTransition = "none";
+                }
+
+                n.style.webkitTransition = valueTransition;
+                n.style.MozTransition = valueTransition;
+                n.style.msTransition = valueTransition;
+                n.style.OTransition = valueTransition;
+                n.style.transition = valueTransition;
+
+                var valueTransform = "translateX(" + move + "px) rotate(" + move / 20 + "deg)";
+                n.style.webkitTransform = valueTransform;
+                n.style.MozTransform = valueTransform;
+                n.style.msTransform = valueTransform;
+                n.style.OTransform = valueTransform;
+                n.style.transform = valueTransform;
+
+                var likeOverlay = n.shadowRoot.querySelector('.like.overlay');
+                var dislikeOverlay = n.shadowRoot.querySelector('.dislike.overlay');
+
+                if (move > 100) {
+                    var op = ((move - 100) * 0.5) / 75;
+                    likeOverlay.style.opacity = op;
+                } else if (move < -100) {
+                    var op = ((Math.abs(move) - 100) * 0.5) / 75;
+                    dislikeOverlay.style.opacity = op;
+                } else {
+                    likeOverlay.style.opacity = 0;
+                    dislikeOverlay.style.opacity = 0;
+                }
+            },
+
+            applyLike: function (n, like) {
+
+                if (like) {
+                    var move = 300;
+                } else {
+                    var move = -300;
+                }
+
+                var valueTransition = "all 0.3s";
+                n.style.webkitTransition = valueTransition;
+                n.style.MozTransition = valueTransition;
+                n.style.msTransition = valueTransition;
+                n.style.OTransition = valueTransition;
+                n.style.transition = valueTransition;
+
+                var valueTransform = "translateX(" + move + "px) rotate(" + move / 20 + "deg)";
+                n.style.webkitTransform = valueTransform;
+                n.style.MozTransform = valueTransform;
+                n.style.msTransform = valueTransform;
+                n.style.OTransform = valueTransform;
+                n.style.transform = valueTransform;
+
+                n.style.opacity = 0;
+
+                setTimeout(function () {
+                    n.remove();
+                }, 300);
+            }
+        };
+
+        Polymer('flick-card', {
+            isTapped: false,
+            isHold: false,
+            ready: function () {
+                PolymerGestures.addEventListener(this, "down", this.onDown.bind(this));
+                PolymerGestures.addEventListener(this, "track", this.onMove.bind(this));
+                PolymerGestures.addEventListener(this, "up", this.onUp.bind(this));
+                PolymerGestures.addEventListener(this, "mouseleave", this.onUp.bind(this));
+                PolymerGestures.addEventListener(this, "tap", this.onTap.bind(this));
+                PolymerGestures.addEventListener(this, "hold", this.onHold.bind(this));
+            },
+            onHold: function (e) {
+                this.classList.add('isHold');
+                this.isHold = true;
+            },
+            onTap: function (e) {
+                if(!this.isHold) {
+                    //this.classList.add('isHold');
+                    this.$.ripple.downAction({x: e.x, y: e.y});
+
+                    var scope = this;
+
+                    setTimeout(function () {
+                        scope.$.ripple.upAction();
+                    }, 300);
+                }
+            },
+            onDown: function (e) {
+                this.point = new xPoint(e.clientX);
+
+                this.classList.add('touching');
+            },
+            onMove: function (e) {
+                this.classList.add('isHold');
+                this.isHold = true;
+                this.$.ripple.upAction();
+
+                var p = this.point;
+                if (p) {
+                    p.update(e.clientX);
+
+                    util.applyAnimations(this, p.distance());
+                }
+            },
+            onUp: function (e) {
+                var treshold = 150;
+                this.$.ripple.upAction();
+
+                this.classList.remove('touching');
+
+                var p = this.point;
+                if (!p) {
+                    return;
+                }
+
+                if (p.distance() <= -treshold) {
+
+                    this.classList.add('disliked');
+
+                    util.applyLike(this, false);
+
+                } else if (p.distance() >= treshold) {
+
+                    this.classList.add('liked');
+
+                    util.applyLike(this, true);
+
+                } else {
+                    this.classList.remove('disliked');
+                    this.classList.remove('liked');
+                    this.async(this.snapBack);
+                }
+
+                var scope = this;
+
+                setTimeout(function () {
+                    scope.classList.remove('isHold');
+                    scope.isHold = false;
+                }, 200);
+
+                this.point = null;
+            },
+
+            snapBack: function () {
+                util.applyAnimations(this, 0);
+            }
+        });
+    </script>
+</polymer-element>
+
+<polymer-element name="card-holder" attributes="data amount cardTapFunction">
+    <template>
+        <link href="assets/css/card-holder.css" rel="stylesheet" type="text/css">
+        <template repeat="{{article, articleIndex in data.models}}">
+            <flick-card data-tags="{{article.tags}}" style="z-index: {{data.models.length - articleIndex}};" data-articleid="{{article.id}}" on-tap="{{cardTapFunction}}">
+                <h1><template is="juicy-html" content="{{article.short_title | encodeEntities}}"></template></h1>
+                <core-image sizing="cover" position="center" src="{{article.img}}" preload placeholder="{{article.imgplaceholder}}" fade></core-image>
+            </flick-card>
+        </template>
+    </template>
+    <script>
+        Polymer('card-holder', {
+            data: [],
+            amount: 5,
+            created: function () {
+            },
+            ready: function () {
+            }
+        });
+    </script>
+</polymer-element>
+
 <polymer-element name="my-time-mag">
     <template>
         <link href="assets/css/style.css" rel="stylesheet" type="text/css">
         <core-animated-pages selected="{{options.page}}" notap id="core_pages"
-                             transitions="hero-transition cross-fade">
-            <section id="section-login" active horizontal layout center center-justified>
+                             transitions="hero-transition cross-fade slide-up">
+            <section id="section-login" horizontal layout center center-justified>
                 <paper-shadow z="5" id="login-card" class="card" layout vertical cross-fade>
                     <h1>Sign-In</h1>
-                    <paper-input-decorator id="loginEmailDecorator" label="Email" floatinglabel layout vertical
-                                           error="{{login.error.email}}">
-                        <input id="loginEmailInput" is="core-input" type="email"
-                               committedValue="{{login.committedValues.email}}" required
-                               pattern="^[A-Za-z0-9._%+-]+@([A-Za-z0-9-]+\.)+([A-Za-z0-9]{2,4})$"
-                               on-input="{{validateEmail}}" on-change="{{validateEmail}}">
+                    <paper-input-decorator id="loginEmailDecorator" label="Email" floatinglabel layout vertical error="{{login.error.email}}">
+                        <input id="loginEmailInput" is="core-input" type="email" committedValue="{{login.committedValues.email}}" required
+                               pattern="^[A-Za-z0-9._%+-]+@([A-Za-z0-9-]+\.)+([A-Za-z0-9]{2,4})$" on-input="{{validateEmail}}" on-change="{{validateEmail}}">
                     </paper-input-decorator>
-                    <paper-input-decorator id="loginPasswordDecorator" label="Password" floatinglabel layout
-                                           vertical error="{{login.error.password}}">
-                        <input id="loginPasswordInput" is="core-input" type="password"
-                               committedValue="{{login.committedValues.password}}" required
-                               on-input="{{validatePassword}}" on-change="{{validatePassword}}">
+                    <paper-input-decorator id="loginPasswordDecorator" label="Password" floatinglabel layout vertical error="{{login.error.password}}">
+                        <input id="loginPasswordInput" is="core-input" type="password" committedValue="{{login.committedValues.password}}" required on-input="{{validatePassword}}"
+                               on-change="{{validatePassword}}">
                     </paper-input-decorator>
                     <paper-button id="login-button" on-tap="{{checkLogin}}" hero-id="bar" hero>Login</paper-button>
-                    <core-ajax id="loginAjax" url="http://mytimemag.rodey.nl/private/user.php?action=login"
-                               params='{{login.committedValues}}' handleAs="json"
-                               on-core-response="{{loginResponse}}"></core-ajax>
                 </paper-shadow>
+                <core-ajax auto id="loginAjax" url="http://mytimemag.rodey.nl/private/user.php?action=login" params='{{login.committedValues}}' handleAs="json"
+                           on-core-response="{{loginResponse}}"></core-ajax>
             </section>
-            <section id="section-content" active horizontal layout center center-justified>
-                <core-drawer-panel cross-fade>
+            <section id="section-content" horizontal layout center center-justified>
+                <core-drawer-panel disableSwipe>
                     <div drawer>
                         <core-toolbar>
-                            <span class="title" flex><core-icon icon="account-circle"></core-icon>{{options.account.email}}</span>
+                            <span class="title" flex><core-icon icon="account-circle"></core-icon>{{login.account.email}}</span>
                         </core-toolbar>
                     </div>
                     <div main layout vertical>
-                        <core-toolbar hero-id="bar" hero>
+                        <core-toolbar hero-id="bar" hero cross-fade>
                             <paper-icon-button icon="account-circle" core-drawer-toggle></paper-icon-button>
-                            <span class="title" show?="{{showingSections}}" flex layout horizontal center-center>
+                            <span class="title" show?="{{options.sections.show}}" flex layout horizontal center-center>
                                 <span>My TIME Mag.</span>
                                 <paper-icon-button icon="arrow-drop-down"
                                                    on-click="{{toggleSections}}"></paper-icon-button>
@@ -77,12 +288,12 @@
                                                    on-click="{{toggleSections}}"></paper-icon-button>
                             </span>
 
-                            <div id="searchHolder" show?="{{showingSearch}}">
+                            <div id="searchHolder" show?="{{options.search.show}}">
                                 <paper-icon-button icon="search" on-click="{{toggleSearch}}"></paper-icon-button>
                                 <input type="search" id="searchInput" on-keyup="{{checkSearch}}" autocomplete="off">
                             </div>
                         </core-toolbar>
-                        <paper-tabs selected="{{options.section.page}}" show?="{{showingSections}}" scrollable>
+                        <paper-tabs selected="{{options.sections.page}}" show?="{{options.sections.show}}" noink scrollable>
                             <paper-tab>My Time Mag.</paper-tab>
                             <paper-tab>Section 2</paper-tab>
                             <paper-tab>Section 3</paper-tab>
@@ -92,19 +303,45 @@
                             <paper-tab>Section 7</paper-tab>
                         </paper-tabs>
 
-                        <core-animated-pages selected="{{options.section.page}}" notap transitions="slide-from-right" flex>
+                        <core-animated-pages selected="{{options.sections.page}}" notap transitions="slide-from-right" flex>
 
-                            <section horizontal layout center center-justified slide-from-right>
+                            <section id="myTimeMag" horizontal vertical layout center center-justified slide-from-right>
+                                <core-ajax id="contentAjax" url="http://mytimemag.rodey.nl/private/content.php?action=get" params='{{contentAjaxParams}}' handleAs="json"
+                                           on-core-response="{{contentLoadedResponse}}"></core-ajax>
 
-                                <paper-shadow z="2" class="main-card" layout vertical>
-                                    <h1>PAGE 1</h1>
-                                </paper-shadow>
+                                <card-holder id="cardHolder" data="{{itemData}}" cardTapFunction="{{cardTapped}}" hero-id="articleCard" hero></card-holder>
+                            </section>
 
+                            <section id="otherSection" horizontal vertical layout center center-justified slide-from-right>
+                                <h1>Other Section Header</h1>
                             </section>
 
                         </core-animated-pages>
                     </div>
                 </core-drawer-panel>
+            </section>
+            <section id="section-article" layout vertical>
+                <core-ajax id="articleAjax" url="http://mytimemag.rodey.nl/private/content.php?action=get" params='{{articleAjaxParams}}' handleAs="json"
+                           on-core-response="{{articleLoadedResponse}}"></core-ajax>
+
+                <core-header-panel id="articleContainer" mode="waterfall-tall" flex hero-id="articleCard" hero>
+                    <core-toolbar style="background-image: url({{articleData.hero.src.small_2x}}); background-size: cover; background-blend-mode: multiply;">
+                        <paper-icon-button icon="clear" on-tap="{{prevPage}}"></paper-icon-button>
+                        <span flex></span>
+                        <paper-icon-button icon="favorite"></paper-icon-button>
+                        <span class="title bottom indent" flex layout horizontal>
+                            <span>{{articleData.section.name}}</span>
+                        </span>
+                    </core-toolbar>
+
+
+                    <article cross-fade>
+                        <h1><template is="juicy-html" content="{{articleData.title | encodeEntities}}"></template></h1>
+                        <h3><template is="juicy-html" content="{{articleData.excerpt | encodeEntities}}"></template></h3>
+                        <template is="juicy-html" content="{{articleData.content | encodeEntities}}"></template>
+                    </article>
+                </core-header-panel>
+                <paper-fab id="like-buttom" icon="thumb-up" slide-up></paper-fab>
             </section>
         </core-animated-pages>
 
@@ -112,29 +349,56 @@
     <script>
 
         Polymer('my-time-mag', {
-            options: [],
-            showingSearch: false,
-            showingSections: false,
+            options: {
+                page: 0,
+                sections: {
+                    show: false,
+                    name: "",
+                    page: 0
+                },
+                search: {
+                    show: false
+                }          
+            },
+            login: {
+                account: {id: false, email: false, password: false},
+                error: {},
+                committedValues: {}
+            },
+            itemData: {
+                index: 0,
+                models: []
+            },
+            articleData: {
+            },
+            contentAjaxParams: {},
+            articleAjaxParams: {},
 
             created: function () {
-                this.login = {};
-                this.login.error = {};
-                this.login.committedValues = {};
-                this.options.section = {};
             },
 
             ready: function () {
-                var scope = this;
-                this.options.page = 0;
-                this.options.section.page = 0;
-                this.options.account = [{id: false}];
+                scope = this;
             },
 
-            nextPage: function (scope) {
-                if (!scope) {
-                    this.options.page++;
-                } else {
-                    scope.options.page++;
+            nextPage: function () {
+                this.options.page++;
+
+                if(this.options.page == 1) {
+                    this.options.sections.name = "latest";
+                    this.contentAjaxParams = {section: this.options.sections.name, account: this.login.account.id};
+                    this.$.contentAjax.go();
+                }
+            },
+
+            prevPage: function () {
+                this.options.page--;
+
+                if(this.options.page == 1) {
+                    this.$.articleContainer.scroller.scrollTop = 0;
+                    this.options.sections.name = "latest";
+                    this.contentAjaxParams = {section: this.options.sections.name, account: this.login.account.id};
+                    this.$.contentAjax.go();
                 }
             },
 
@@ -191,21 +455,50 @@
                 return !decorator.isInvalid;
             },
 
+            contentLoadedResponse: function (event, r) {
+                response = r.response;
+
+                this.itemData.models = response.articles;
+            },
+
+            articleLoadedResponse: function (event, r) {
+                response = r.response;
+
+                this.articleData = response;
+
+                this.nextPage();
+            },
+
+            cardTapped: function(e, d, s) {
+                if(!s.classList.contains('isHold')) {
+                    scope.articleAjaxParams = {page: s.attributes['data-articleid'].value};
+                    scope.$.articleAjax.go();
+                }
+            },
+
             loginResponse: function (event, r) {
                 response = r.response;
 
-                if (!response.account.id) {
-                    this.validateEmail("invalid");
+                if(response.action == "session") {
+                    if (response.account.id && response.account.password) {
+                        this.login.account = response.account;
 
-                    return;
-                } else if (!response.account.password) {
-                    this.validatePassword("invalid");
+                        this.nextPage();
+                    }
+                } else if(response.action == "login") {
+                    if (!response.account.id) {
+                        this.validateEmail("invalid");
 
-                    return;
-                } else {
-                    this.options.account = response.account;
+                        return;
+                    } else if (!response.account.password) {
+                        this.validatePassword("invalid");
 
-                    this.nextPage();
+                        return;
+                    } else {
+                        this.login.account = response.account;
+
+                        this.nextPage();
+                    }
                 }
             },
 
@@ -221,7 +514,7 @@
 
                 setTimeout(function () {
 
-                    scope.showingSearch = !scope.showingSearch;
+                    scope.options.search.show = !scope.options.search.show;
                     scope.classList.toggle('search-on');
                     scope.async(function () {
                         scope.$.searchInput.focus();
@@ -241,7 +534,7 @@
                 var scope = this;
 
                 setTimeout(function () {
-                    scope.showingSections = !scope.showingSections;
+                    scope.options.sections.show = !scope.options.sections.show;
                     scope.classList.toggle('sections-on');
                 }, 0);
 
@@ -259,6 +552,13 @@
                 }
             }
         });
+
+        // Add it as a global expression because it won't detect it elsewise
+        PolymerExpressions.prototype.encodeEntities = function(html) {
+            var txt = document.createElement("textarea");
+            txt.innerHTML = html;
+            return txt.value;
+        };
 
     </script>
 </polymer-element>
