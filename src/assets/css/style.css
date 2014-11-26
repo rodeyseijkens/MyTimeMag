@@ -23,7 +23,7 @@
   padding: 10px;
   margin: 30px 0px 0px;
   color: white;
-  background-color: #6386c5;
+  background-color: #e90606;
 }
 .search-on core-toolbar paper-icon-button,
 .search-on core-toolbar span.title {
@@ -37,7 +37,7 @@ core-drawer-panel {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 core-drawer-panel core-toolbar {
-  background-color: #6386c5;
+  background-color: #e90606;
   color: white;
 }
 core-drawer-panel core-toolbar .title {
@@ -68,10 +68,10 @@ core-drawer-panel [main] paper-tabs {
   transition: height .2s;
 }
 core-drawer-panel [main] paper-tabs::shadow #selectionBar {
-  background-color: #6386c5;
+  background-color: #e90606;
 }
 core-drawer-panel [main] paper-tabs paper-tab::shadow #ink {
-  color: #6386c5;
+  color: #e90606;
   opacity: .5;
 }
 core-drawer-panel [main] paper-tabs[show] {
@@ -109,7 +109,7 @@ core-drawer-panel [drawer] .title [icon=account-circle] {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  background-color: #6386c5;
+  background-color: #e90606;
 }
 #searchHolder input {
   background-color: inherit;
@@ -143,11 +143,8 @@ core-drawer-panel [drawer] .title [icon=account-circle] {
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.22);
 }
-#section-article {
-  background: white;
-}
 #section-article core-toolbar {
-  background-color: #6386c5;
+  background-color: #e90606;
   color: white;
 }
 #section-article core-toolbar .title {
@@ -165,8 +162,12 @@ core-drawer-panel [drawer] .title [icon=account-circle] {
   z-index: 10;
   bottom: 20px;
   right: 10px;
+  bottom: black;
+  color: #757575;
+  background: white;
 }
 #section-article article {
+  background: white;
   box-sizing: border-box;
   float: left;
   padding: 20px;
@@ -179,4 +180,10 @@ core-drawer-panel [drawer] .title [icon=account-circle] {
 }
 #section-article article h3 {
   font-size: 20px;
+}
+#section-article .capsule {
+  border-radius: 24px;
+  width: auto;
+  padding: 16px 0 16px 24px;
+  margin: 10px;
 }

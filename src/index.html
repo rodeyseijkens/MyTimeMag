@@ -20,6 +20,7 @@
     <link rel="import" href="../bower_components/core-drawer-panel/core-drawer-panel.html">
     <link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
     <link rel="import" href="../bower_components/core-icon/core-icon.html">
+    <link rel="import" href="../bower_components/core-icons/social-icons.html">
     <link rel="import" href="../bower_components/core-icon-button/core-icon-button.html">
     <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
     <link rel="import" href="../bower_components/core-image/core-image.html">
@@ -31,6 +32,7 @@
     <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
     <link rel="import" href="../bower_components/juicy-html/juicy-html.html">
     <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+    <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 
     <link href="assets/css/main.css" rel="stylesheet" type="text/css">
@@ -40,7 +42,7 @@
 <polymer-element name="flick-card">
     <template>
         <link href="assets/css/flick-card.css" rel="stylesheet" type="text/css">
-        <paper-shadow z="1" layout vertical>
+        <paper-shadow id="cardShadow" z="1" layout vertical>
             <core-icon icon="thumb-up" class="like overlay"></core-icon>
             <core-icon icon="thumb-down" class="dislike overlay"></core-icon>
             <content></content>
@@ -95,11 +97,11 @@
                 var likeOverlay = n.shadowRoot.querySelector('.like.overlay');
                 var dislikeOverlay = n.shadowRoot.querySelector('.dislike.overlay');
 
-                if (move > 100) {
-                    var op = ((move - 100) * 0.5) / 75;
+                if (move > 50) {
+                    var op = ((move - 50) * 0.5) / 75;
                     likeOverlay.style.opacity = op;
-                } else if (move < -100) {
-                    var op = ((Math.abs(move) - 100) * 0.5) / 75;
+                } else if (move < -50) {
+                    var op = ((Math.abs(move) - 50) * 0.5) / 75;
                     dislikeOverlay.style.opacity = op;
                 } else {
                     likeOverlay.style.opacity = 0;
@@ -320,7 +322,7 @@
 
                             <section id="myTimeMag" horizontal vertical layout center center-justified slide-from-right>
 
-                                <card-holder id="cardHolder" data="{{itemData}}" articleLikeFunction="{{articleSwiped}}" cardTapFunction="{{cardTapped}}" hero-id="articleCard" hero></card-holder>
+                                <card-holder id="cardHolder" data="{{itemData}}" articleLikeFunction="{{articleSwiped}}" cardTapFunction="{{cardTapped}}" hero-id="articleCard" hero?="{{openedArticle != false}}" cross-fade?="{{openedArticle == false}}"></card-holder>
                             </section>
 
                             <section id="otherSection" horizontal vertical layout center center-justified slide-from-right>
@@ -332,23 +334,25 @@
                 </core-drawer-panel>
             </section>
             <section id="section-article" layout vertical>
-                <core-header-panel id="articleContainer" mode="waterfall-tall" flex hero-id="articleCard" hero>
-                    <core-toolbar style="background-image: url({{articleData.hero.src.small_2x}}); background-size: cover; background-blend-mode: multiply;">
-                        <paper-icon-button icon="clear" on-tap="{{prevPage}}"></paper-icon-button>
+                <core-header-panel id="articleContainer" mode="waterfall-tall" flex data-tags="{{articleData.tags}}" data-articleid="{{articleData.id}}">
+                    <core-toolbar style="background-image: url({{articleData.hero.src.small_2x}}); background-size: cover; background-blend-mode: multiply;" hero-id="articleCard" hero?="{{openedArticle != false}}" cross-fade?="{{openedArticle == false}}">
+                        <paper-icon-button icon="close" on-tap="{{articleClose}}"></paper-icon-button>
                         <span flex></span>
-                        <paper-icon-button icon="favorite"></paper-icon-button>
+                        <paper-icon-button id="favoredButton" icon="favorite-outline" on-tap="{{articleFavored}}"></paper-icon-button>
                         <span class="title bottom indent" flex layout horizontal>
                             <span>{{articleData.section.name}}</span>
                         </span>
                     </core-toolbar>
 
-                    <article cross-fade>
+                    <article slide-up>
                         <h1><template is="juicy-html" content="{{articleData.title | encodeEntities}}"></template></h1>
                         <h3><template is="juicy-html" content="{{articleData.excerpt | encodeEntities}}"></template></h3>
                         <template is="juicy-html" content="{{articleData.content | encodeEntities}}"></template>
                     </article>
                 </core-header-panel>
-                <paper-fab id="like-buttom" icon="thumb-up" slide-up></paper-fab>
+                <paper-fab id="like-buttom" icon="social:share" slide-up></paper-fab>
+
+                <paper-toast id="toastAlert" class="capsule" text="{{toastAlertText}}"></paper-toast>
             </section>
         </core-animated-pages>
 
@@ -378,11 +382,17 @@
             },
             articleData: {
             },
+            openedArticle: false,
             contentAjaxParams: {},
             articleAjaxParams: {},
             articleInterestParams: {},
+            toastAlertText: "",
 
             created: function () {
+                CoreStyle.g.paperInput.labelColor = "#757575";
+                CoreStyle.g.paperInput.focusedColor = "#757575";
+                CoreStyle.g.paperInput.cursorColor = "#757575";
+                CoreStyle.g.paperInput.invalidColor = "#B71C1C";
             },
 
             ready: function () {
@@ -401,14 +411,6 @@
 
             prevPage: function () {
                 this.options.page--;
-
-                if(this.options.page == 1) {
-                    this.$.articleContainer.scroller.scrollTop = 0;
-
-//                    this.options.sections.name = "latest";
-//                    this.contentAjaxParams = {section: this.options.sections.name, account: this.login.account.id};
-//                    this.$.contentAjax.go();
-                }
             },
 
             checkLogin: function () {
@@ -485,10 +487,52 @@
             },
 
             cardTapped: function(e, d, s) {
+
                 if(!s.classList.contains('isHold')) {
                     scope.articleAjaxParams = {page: s.attributes['data-articleid'].value};
                     scope.$.articleAjax.go();
+
+                    s.$.cardShadow.setZ(5);
+
+                    var valueTransform = "scale(1.1)";
+                    s.style.webkitTransform = valueTransform;
+                    s.style.MozTransform = valueTransform;
+                    s.style.msTransform = valueTransform;
+                    s.style.OTransform = valueTransform;
+                    s.style.transform = valueTransform;
+
+                    scope.openedArticle = s;
                 }
+
+            },
+
+            articleFavored: function(e, d, s) {
+                if( s.icon != 'favorite') {
+                    s.icon = 'favorite';
+
+                    this.toastAlertText = "Added to favorites";
+
+                    this.articleInterest(2, this.$.articleContainer.attributes['data-tags'].value);
+                } else {
+                    s.icon = 'favorite-outline';
+
+                    this.toastAlertText = "Removed from favorites";
+                }
+                this.$.toastAlert.show();
+            },
+
+            articleClose: function(e, d, s) {
+                this.$.articleContainer.scroller.scrollTop = 0;
+
+                this.articleInterest(2, this.$.articleContainer.attributes['data-tags'].value);
+
+//                setTimeout(function(){scope.$.favoredButton.icon = 'favorite-outline'}, 1000);
+
+                this.openedArticle.remove();
+
+                this.openedArticle = false;
+
+                this.prevPage();
             },
 
             articleSwiped: function(e, d, s) {

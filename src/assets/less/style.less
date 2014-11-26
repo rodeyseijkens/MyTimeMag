@@ -1,5 +1,4 @@
-@mainColor: rgb(99, 134, 197);
-@secondColor: rgb(64, 89, 169);
+@mainColor: #E90606;
 
 #core_pages {
   width: 100%;
@@ -187,7 +186,6 @@ core-drawer-panel {
 }
 
 #section-article {
-  background: white;
 
   core-toolbar {
     background-color: @mainColor;
@@ -212,9 +210,14 @@ core-drawer-panel {
     z-index: 10;
     bottom: 20px;
     right: 10px;
+    bottom: black;
+    background: white;
+    color: #757575;
+    background: white;
   }
 
   article {
+    background: white;
     box-sizing: border-box;
     float: left;
     padding: 20px;
@@ -229,5 +232,12 @@ core-drawer-panel {
     h3 {
       font-size: 20px;
     }
+  }
+
+  .capsule {
+    border-radius: 24px;
+    width: auto;
+    padding: 16px 0 16px 24px;
+    margin: 10px;
   }
 }
