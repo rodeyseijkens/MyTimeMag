@@ -109,10 +109,15 @@
 
             applyLike: function (n, like) {
 
+
                 if (like) {
                     var move = 300;
+
+                    n.fire('articlelike', {interest: 1});
                 } else {
                     var move = -300;
+
+                    n.fire('articlelike', {interest: 0});
                 }
 
                 var valueTransition = "all 0.3s";
@@ -227,11 +232,11 @@
     </script>
 </polymer-element>
 
-<polymer-element name="card-holder" attributes="data amount cardTapFunction">
+<polymer-element name="card-holder" attributes="data amount cardTapFunction articleLikeFunction">
     <template>
         <link href="assets/css/card-holder.css" rel="stylesheet" type="text/css">
         <template repeat="{{article, articleIndex in data.models}}">
-            <flick-card data-tags="{{article.tags}}" style="z-index: {{data.models.length - articleIndex}};" data-articleid="{{article.id}}" on-tap="{{cardTapFunction}}">
+            <flick-card data-tags="{{article.tags}}" style="z-index: {{data.models.length - articleIndex}};" data-articleid="{{article.id}}" on-articlelike="{{articleLikeFunction}}" on-tap="{{cardTapFunction}}">
                 <h1><template is="juicy-html" content="{{article.short_title | encodeEntities}}"></template></h1>
                 <core-image sizing="cover" position="center" src="{{article.img}}" preload placeholder="{{article.imgplaceholder}}" fade></core-image>
             </flick-card>
@@ -251,6 +256,14 @@
 
 <polymer-element name="my-time-mag">
     <template>
+        <core-ajax id="contentAjax" url="http://mytimemag.rodey.nl/private/content.php?action=get" params='{{contentAjaxParams}}' handleAs="json"
+                   on-core-response="{{contentLoadedResponse}}"></core-ajax>
+        <core-ajax id="articleAjax" url="http://mytimemag.rodey.nl/private/content.php?action=get" params='{{articleAjaxParams}}' handleAs="json"
+                   on-core-response="{{articleLoadedResponse}}"></core-ajax>
+        <core-ajax id="articleInterestedAjax" url="http://mytimemag.rodey.nl/private/interest.php?action=set" params='{{articleInterestParams}}' handleAs="json"
+                   on-core-response="{{interestedLoadedResponse}}"></core-ajax>
+
+
         <link href="assets/css/style.css" rel="stylesheet" type="text/css">
         <core-animated-pages selected="{{options.page}}" notap id="core_pages"
                              transitions="hero-transition cross-fade slide-up">
@@ -306,10 +319,8 @@
                         <core-animated-pages selected="{{options.sections.page}}" notap transitions="slide-from-right" flex>
 
                             <section id="myTimeMag" horizontal vertical layout center center-justified slide-from-right>
-                                <core-ajax id="contentAjax" url="http://mytimemag.rodey.nl/private/content.php?action=get" params='{{contentAjaxParams}}' handleAs="json"
-                                           on-core-response="{{contentLoadedResponse}}"></core-ajax>
 
-                                <card-holder id="cardHolder" data="{{itemData}}" cardTapFunction="{{cardTapped}}" hero-id="articleCard" hero></card-holder>
+                                <card-holder id="cardHolder" data="{{itemData}}" articleLikeFunction="{{articleSwiped}}" cardTapFunction="{{cardTapped}}" hero-id="articleCard" hero></card-holder>
                             </section>
 
                             <section id="otherSection" horizontal vertical layout center center-justified slide-from-right>
@@ -321,9 +332,6 @@
                 </core-drawer-panel>
             </section>
             <section id="section-article" layout vertical>
-                <core-ajax id="articleAjax" url="http://mytimemag.rodey.nl/private/content.php?action=get" params='{{articleAjaxParams}}' handleAs="json"
-                           on-core-response="{{articleLoadedResponse}}"></core-ajax>
-
                 <core-header-panel id="articleContainer" mode="waterfall-tall" flex hero-id="articleCard" hero>
                     <core-toolbar style="background-image: url({{articleData.hero.src.small_2x}}); background-size: cover; background-blend-mode: multiply;">
                         <paper-icon-button icon="clear" on-tap="{{prevPage}}"></paper-icon-button>
@@ -333,7 +341,6 @@
                             <span>{{articleData.section.name}}</span>
                         </span>
                     </core-toolbar>
-
 
                     <article cross-fade>
                         <h1><template is="juicy-html" content="{{articleData.title | encodeEntities}}"></template></h1>
@@ -373,6 +380,7 @@
             },
             contentAjaxParams: {},
             articleAjaxParams: {},
+            articleInterestParams: {},
 
             created: function () {
             },
@@ -396,9 +404,10 @@
 
                 if(this.options.page == 1) {
                     this.$.articleContainer.scroller.scrollTop = 0;
-                    this.options.sections.name = "latest";
-                    this.contentAjaxParams = {section: this.options.sections.name, account: this.login.account.id};
-                    this.$.contentAjax.go();
+
+//                    this.options.sections.name = "latest";
+//                    this.contentAjaxParams = {section: this.options.sections.name, account: this.login.account.id};
+//                    this.$.contentAjax.go();
                 }
             },
 
@@ -469,10 +478,39 @@
                 this.nextPage();
             },
 
+            interestedLoadedResponse: function (event, r) {
+                response = r.response;
+
+                console.log(response);
+            },
+
             cardTapped: function(e, d, s) {
                 if(!s.classList.contains('isHold')) {
                     scope.articleAjaxParams = {page: s.attributes['data-articleid'].value};
                     scope.$.articleAjax.go();
+                }
+            },
+
+            articleSwiped: function(e, d, s) {
+                scope.articleInterest(d.interest, s.attributes['data-tags'].value);
+            },
+
+            articleInterest: function(interest, tags) {
+
+                console.log(tags);
+
+                switch(interest) {
+                    case 3:
+                        console.log('FAVORED!!');
+                        break;
+                    case 2:
+                        console.log('READ!!');
+                        break;
+                    case 1:
+                        console.log('LIKED!!');
+                        break;
+                    default:
+                        console.log('DISLIKE!!');
                 }
             },
 
