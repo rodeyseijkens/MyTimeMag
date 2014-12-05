@@ -6,7 +6,7 @@
 }
 .card {
   width: 100%;
-  max-width: 300px;
+  max-width: 270px;
   height: auto;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
@@ -77,6 +77,21 @@ core-drawer-panel [main] paper-tabs paper-tab::shadow #ink {
 core-drawer-panel [main] paper-tabs[show] {
   height: 43px;
 }
+core-drawer-panel [main] section #cardSpinner {
+  display: none;
+}
+core-drawer-panel [main] section #cardSpinner[active] {
+  display: block;
+}
+core-drawer-panel [main] section #cardSpinner[active]::shadow .circle {
+  border-color: #757575;
+}
+core-drawer-panel [main] section #cardHolder {
+  display: block;
+}
+core-drawer-panel [main] section #cardHolder[hide] {
+  display: none;
+}
 core-drawer-panel [drawer] {
   background: white;
 }
@@ -110,6 +125,7 @@ core-drawer-panel [drawer] .title [icon=account-circle] {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   background-color: #e90606;
+  display: none;
 }
 #searchHolder input {
   background-color: inherit;
@@ -170,7 +186,7 @@ core-drawer-panel [drawer] .title [icon=account-circle] {
   background: white;
   box-sizing: border-box;
   float: left;
-  padding: 20px;
+  padding: 20px 20px 80px 20px;
   width: 100%;
   z-index: 0;
 }
@@ -180,6 +196,18 @@ core-drawer-panel [drawer] .title [icon=account-circle] {
 }
 #section-article article h3 {
   font-size: 20px;
+}
+#section-article article img {
+  width: 100%;
+  height: auto;
+}
+#section-article article a {
+  text-decoration: none;
+  color: #0c97d2;
+}
+#section-article article .video-wrapper iframe {
+  width: 100%;
+  height: auto;
 }
 #section-article .capsule {
   border-radius: 24px;

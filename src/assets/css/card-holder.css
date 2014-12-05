@@ -1,54 +1,106 @@
-:host {
-  width: 100%;
-  max-width: 250px;
-  height: 100%;
-  max-height: 300px;
+:host #cardHolder {
+  width: 80%;
+  height: 75%;
+  max-width: 300px;
+  max-height: 350px;
   display: block;
   z-index: 0;
-}
-:host flick-card {
-  display: none;
+  position: relative;
+  pointer-events: all;
   opacity: 0;
-  transition: transform .3s;
+  transition: opacity 1s;
 }
-:host flick-card h1 {
+:host #cardHolder[show] {
+  opacity: 1;
+}
+:host #cardHolder flick-card {
+  transition: transform .3s;
+  width: 100%;
+  height: 100%;
+}
+:host #cardHolder flick-card h1 {
   position: absolute;
   bottom: 0;
   font-size: 22px;
   padding: 20px;
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
-  font-weight: 200;
+  font-weight: 300;
   margin: 0;
   z-index: 1;
+  width: 100%;
+  box-sizing: border-box;
 }
-:host flick-card core-image {
+:host #cardHolder flick-card core-image {
   width: 100%;
   height: 100%;
 }
-:host flick-card:nth-child(5) {
+:host #cardHolder flick-card:nth-child(4) {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+  transition: none;
+}
+:host #cardHolder flick-card:nth-child(4) h1 {
+  display: none;
+}
+:host #cardHolder flick-card:nth-last-child(1) {
+  -webkit-transform: rotate(-2deg);
+  transform: rotate(-2deg);
+  transition: none;
+}
+:host #cardHolder flick-card:nth-last-child(1) core-image {
+  display: none;
+}
+:host #cardHolder flick-card:nth-last-child(1) h1 {
+  display: none;
+}
+:host #cardHolder flick-card:nth-last-child(2) {
+  -webkit-transform: rotate(5deg);
+  transform: rotate(5deg);
+  transition: none;
+}
+:host #cardHolder flick-card:nth-last-child(2) core-image {
+  display: none;
+}
+:host #cardHolder flick-card:nth-last-child(2) h1 {
+  display: none;
+}
+:host #cardHolder flick-card:nth-child(3) {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+}
+:host #cardHolder flick-card:nth-child(2) {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+}
+.wc-polyfill :host #cardHolder flick-card:nth-child(4) {
+  -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
   opacity: 0;
   display: block;
   transition: opacity .3s;
 }
-:host flick-card:nth-child(4) {
+.wc-polyfill :host #cardHolder flick-card:nth-child(3) {
+  -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
   opacity: 1;
   display: block;
   transition: opacity .3s;
 }
-:host flick-card:nth-last-child(1) {
+.wc-polyfill :host #cardHolder flick-card:nth-last-child(1) {
+  -webkit-transform: rotate(-2deg);
   transform: rotate(-2deg);
   opacity: 1;
   display: block;
 }
-:host flick-card:nth-last-child(2) {
+.wc-polyfill :host #cardHolder flick-card:nth-last-child(2) {
+  -webkit-transform: rotate(5deg);
   transform: rotate(5deg);
   opacity: 1;
   display: block;
 }
-:host flick-card:nth-child(3) {
+.wc-polyfill :host #cardHolder flick-card:nth-child(2) {
+  -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
   opacity: 1;
   display: block;
