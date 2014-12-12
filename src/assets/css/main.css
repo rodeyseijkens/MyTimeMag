@@ -3,7 +3,7 @@ body {
   font-family: 'RobotoDraft', sans-serif;
   height: 100%;
   margin: 0;
-  background: #E90606;
+  background-color: #E90606;
 }
 * {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);

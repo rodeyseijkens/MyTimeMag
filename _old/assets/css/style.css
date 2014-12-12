@@ -46,9 +46,11 @@ core-drawer-panel core-toolbar .title {
 core-drawer-panel [main] core-toolbar .title span {
   margin-left: 24px;
 }
+core-drawer-panel [main] core-toolbar .title paper-icon-button {
+  display: inline-block;
+}
 core-drawer-panel [main] core-toolbar .title paper-icon-button[icon=arrow-drop-down] {
   visibility: visible;
-  display: inline-block;
 }
 core-drawer-panel [main] core-toolbar .title paper-icon-button[icon=arrow-drop-up] {
   visibility: hidden;
